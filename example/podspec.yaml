@@ -1,0 +1,30 @@
+localization:
+  default_locale: en
+
+extensions:
+  preprocessors:
+  - extensions.jazzhr.JazzhrPreprocessor
+
+preprocessors:
+- kind: jazzhr
+  autorun: true
+  api_key: #your-api-key-here
+  jobs_collection: /content/jobs
+  #departments_collection: /content/departments
+  #departments_blacklist:
+  #- Finance
+  #education_path: /content/partials/education.yaml
+  allowed_html_tags:
+  - b
+  - br
+  - em
+  - i
+  - li
+  - ol
+  - p
+  - strong
+  - u
+  - ul
+  allowed_html_attributes:
+  - tag: a
+    attributes: [href, src]

@@ -1,0 +1,5 @@
+**.mo
+example/.podcache
+example/build/
+example/extensions/
+example/content/jobs/*.yaml
