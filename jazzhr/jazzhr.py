@@ -23,21 +23,12 @@ class JazzhrPreprocessor(grow.Preprocessor):
     KIND = 'jazzhr'
     JOBS_URL = 'https://api.resumatorapi.com/v1/jobs/status/open/confidential/false/private/false?apikey={api_key}'
     JOB_URL = 'https://api.resumatorapi.com/v1/jobs/{job_id}?apikey={api_key}'
-    # DEGREES_URL = 'https://api.greenhouse.io/v1/boards/{board_token}/education/degrees'
-    # DEPARTMENTS_URL = 'https://api.greenhouse.io/v1/boards/{board_token}/departments'
-    # DISCIPLINES_URL = 'https://api.greenhouse.io/v1/boards/{board_token}/education/disciplines'
-    # JOBS_URL = 'https://api.greenhouse.io/v1/boards/{board_token}/jobs?content=true'
-    # JOB_URL = 'https://api.greenhouse.io/v1/boards/{board_token}/jobs/{job_id}?questions=true'
-    # SCHOOLS_URL = 'https://api.greenhouse.io/v1/boards/{board_token}/education/schools'
 
     class Config(messages.Message):
         api_key = messages.StringField(1)
         jobs_collection = messages.StringField(2)
-        # departments_collection = messages.StringField(3)
         allowed_html_tags = messages.StringField(4, repeated=True)
         allowed_html_attributes = messages.MessageField(AttributeMessage, 5, repeated=True)
-        # education_path = messages.StringField(6)
-        # departments_blacklist = messages.StringField(7, repeated=True)
 
     def bind_jobs(self, api_key, collection_path):
         url = JazzhrPreprocessor.JOBS_URL.format(api_key=api_key)
@@ -47,51 +38,15 @@ class JazzhrPreprocessor(grow.Preprocessor):
         content = resp.json()
         self._bind(collection_path, content)
 
-    # def _download_schools(self, board_token):
-    #     schools = {'items': []}
-    #     total = 0
-    #     items_so_far = 0
-    #     page = 1
-    #     has_run = False
-    #     while not has_run or items_so_far < total:
-    #         self.pod.logger.info('Downloading schools (page {})'.format(page))
-    #         url = JazzhrPreprocessor.SCHOOLS_URL.format(board_token=board_token) + '?page={}'.format(page)
-    #         resp = requests.get(url)
-    #         if resp.status_code != 200:
-    #             raise Error('Error requesting -> {}'.format(url))
-    #         resp = resp.json()
-    #         if not has_run:
-    #             has_run = True
-    #             total = resp.get('meta', {}).get('total_count', 0)
-    #         schools['items'] += resp['items']
-    #         items_so_far += len(resp['items'])
-    #         page += 1
-    #     return schools
-
-    # def bind_education(self, board_token, education_path):
-    #     schools = self._download_schools(board_token)
-    #     url = JazzhrPreprocessor.DEGREES_URL.format(board_token=board_token)
-    #     resp = requests.get(url)
-	# if resp.status_code != 200:
-    #         raise Error('Error requesting -> {}'.format(url))
-    #     degrees = resp.json()
-    #     url = JazzhrPreprocessor.DISCIPLINES_URL.format(board_token=board_token)
-    #     resp = requests.get(url)
-	# if resp.status_code != 200:
-    #         raise Error('Error requesting -> {}'.format(url))
-    #     disciplines = resp.json()
-    #     item = {
-    #         'degrees': degrees,
-    #         'disciplines': disciplines,
-    #         'schools': schools,
-    #     }
-    #     path = os.path.join(education_path)
-    #     self.pod.write_yaml(path, item)
-    #     self.pod.logger.info('Saving -> {}'.format(path))
-
     def _parse_entry(self, item):
         if item.get('title'):
             item['$title'] = item.pop('title')
+        if item.get('maximum_salary'):
+            item.set('maximum_salary', '0')
+        if item.get('minimum_salary'):
+            item.set('minimum_salary', '0')
+        if item.get('job_applicants'):
+            item.set('job_applicants', [])
         if item.get('content'):
             item['content'] = self._parse_content(item.get('content'))
         if item.get('compliance'):
@@ -126,20 +81,8 @@ class JazzhrPreprocessor(grow.Preprocessor):
     def _bind(self, collection_path, items):
         existing_paths = self.pod.list_dir(collection_path)
         existing_basenames = [path.lstrip('/') for path in existing_paths]
-        # departments_blacklist = self.config.departments_blacklist or []
-        # departments_blacklist = [name.lower() for name in departments_blacklist]
         new_basenames = []
         for item in items:
-            # Skip departments added to the blacklist.
-            # department_names = [department.get('name', '').lower()
-            #         for department in item.get('departments', [])]
-            # skip = False
-            # for name in department_names:
-            #     if name in departments_blacklist:
-            #        self.pod.logger.info('Skipping department -> {}'.format(name))
-            #        skip = True
-            # if skip:
-            #     continue
             item = self._get_single_job(item)
             item = self._parse_entry(item)
             path = os.path.join(collection_path, '{}.yaml'.format(item['id']))
