@@ -42,11 +42,11 @@ class JazzhrPreprocessor(grow.Preprocessor):
         if item.get('title'):
             item['$title'] = item.pop('title')
         if item.get('maximum_salary'):
-            item.set('maximum_salary', '0')
+            del item['maximum_salary']
         if item.get('minimum_salary'):
-            item.set('minimum_salary', '0')
+            del item['minimum_salary']
         if item.get('job_applicants'):
-            item.set('job_applicants', [])
+            del item['job_applicants']
         if item.get('content'):
             item['content'] = self._parse_content(item.get('content'))
         if item.get('compliance'):
