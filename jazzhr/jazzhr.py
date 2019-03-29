@@ -4,7 +4,6 @@ import bleach
 import grow
 import os
 import requests
-import logging
 try:
     from HTMLParser import HTMLParser
 except ImportError:
@@ -46,7 +45,6 @@ class JazzhrPreprocessor(grow.Preprocessor):
 	if resp.status_code != 200:
             raise Error('Error requesting -> {}'.format(url))
         content = resp.json()
-        logging.info('Jobs response: {}'.format(content))
         self._bind(collection_path, content)
 
     # def _download_schools(self, board_token):
