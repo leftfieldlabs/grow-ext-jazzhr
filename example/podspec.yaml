@@ -10,10 +10,6 @@ preprocessors:
   autorun: true
   api_key:  #your-api-key-here
   jobs_collection: /content/jobs
-  #departments_collection: /content/departments
-  #departments_blacklist:
-  #- Finance
-  #education_path: /content/partials/education.yaml
   allowed_html_tags:
   - b
   - br
