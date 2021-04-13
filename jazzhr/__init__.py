@@ -1,1 +1,1 @@
-from jazzhr import *
+from jazzhr.jazzhr import *
