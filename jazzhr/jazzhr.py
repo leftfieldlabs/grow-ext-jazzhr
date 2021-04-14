@@ -33,7 +33,7 @@ class JazzhrPreprocessor(grow.Preprocessor):
     def bind_jobs(self, api_key, collection_path):
         url = JazzhrPreprocessor.JOBS_URL.format(api_key=api_key)
         resp = requests.get(url)
-        if resp.status_code != 200:
+	if resp.status_code != 200:
             raise Error('Error requesting -> {}'.format(url))
         content = resp.json()
         self._bind(collection_path, content)
@@ -73,7 +73,7 @@ class JazzhrPreprocessor(grow.Preprocessor):
         url = JazzhrPreprocessor.JOB_URL.format(
                 api_key=api_key, job_id=item['id'])
         resp = requests.get(url)
-        if resp.status_code != 200:
+	if resp.status_code != 200:
             raise Error('Error requesting -> {}'.format(url))
         content = resp.json()
         return content
